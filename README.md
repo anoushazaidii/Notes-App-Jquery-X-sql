@@ -7,8 +7,11 @@ This is a basic Notes application with below functionalities:
 - edit
 
 Stack used:
-Html 
-Bootstrap
-Php
-Jquery
-Sql
+- Html
+- Bootstrap
+- Php
+- Jquery
+- Sql
+
+
+
