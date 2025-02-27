@@ -8,6 +8,7 @@ This is a basic Notes application with below functionalities:
 
 Stack used:
 - Html
+- Css
 - Bootstrap
 - Php
 - Jquery
