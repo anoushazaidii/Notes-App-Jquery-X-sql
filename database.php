@@ -137,7 +137,7 @@ function fetchNotes($conn) {
     }
 
     $userId = $_SESSION['user_id'];
-    $query = "SELECT note_id, notes, date_created FROM notes WHERE userid = ?";
+    $query = "SELECT  notes, date_created FROM notes WHERE userid = ?";
     $stmt = mysqli_prepare($conn, $query);
 
     if ($stmt) {

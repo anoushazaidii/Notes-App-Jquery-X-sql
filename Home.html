@@ -32,7 +32,6 @@
       <table class="table">
         <thead class="thead-dark">
           <tr>
-            <th scope="col">ID</th>
             <th scope="col">Your Notes</th>
             <th scope="col">Date Created</th>
             <th scope="col">Actions</th>
@@ -246,7 +245,7 @@
                       const firstLine = note.notes.split('\n')[0]; // Get the first line
                       notesTableBody.append(`
                         <tr>
-                          <td class="stud_id">${note.note_id}</td>
+                         
                           <td>
                             <div class="note-preview" data-full-note="${note.notes}">
                               ${firstLine}
