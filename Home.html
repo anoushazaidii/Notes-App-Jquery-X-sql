@@ -15,7 +15,7 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        max-width: 300px; /* Adjust as needed */
+        max-width: 300px; 
       }
     </style>
   </head>
@@ -222,7 +222,6 @@
           }
         });
 
-        // Show Full Note on Click
         $(document).on("click", ".note-preview", function () {
           const fullNote = $(this).data('full-note');
           $('#fullNoteContent').text(fullNote);
