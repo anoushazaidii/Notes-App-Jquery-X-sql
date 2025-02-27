@@ -5,4 +5,10 @@ This is a basic Notes application with below functionalities:
 - delete
 - view
 - edit
-  
+
+Stack used:
+Html 
+Bootstrap
+Php
+Jquery
+Sql
