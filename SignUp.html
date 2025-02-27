@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css">
+    <title>Sign Up</title>
+</head>
+<body>
+    <div class="container mt-5">
+        <h2 class="text-center">Sign Up</h2>
+        <form id="userForm">
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" class="form-control" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" class="form-control" id="password" name="password" required minlength="8">
+                <small class="text-muted">Password must be at least 8 characters long.</small>
+            </div>
+            <div class="form-group">
+                <label>Gender</label>
+                <div>
+                    <label><input type="radio" name="gender" value="male" required> Male</label>
+                    <label><input type="radio" name="gender" value="female" required> Female</label>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary" id="saveButton">Sign Up</button>
+        </form>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $("#userForm").submit(function(e) {
+                e.preventDefault();
+
+                const password = $("#password").val();
+                if (password.length < 8) {
+                    alert("Password must be at least 8 characters long.");
+                    return;
+                }
+
+                const formData = $(this).serialize() + "&action=signup";
+
+                $.ajax({
+                    type: "POST",
+                    url: "database.php",
+                    data: formData,
+                    success: function(response) {
+                        const data = JSON.parse(response);
+                        if (data.status === "success") {
+                            alert("Signup Successful! Redirecting to Sign In...");
+                            window.location.href = "SignIn.html";
+                        } else {
+                            alert("Error: " + data.message);
+                        }
+                    },
+                    error: function() {
+                        alert("AJAX Error: Unable to process request.");
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

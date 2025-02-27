@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <title>Your Notes</title>
+    <style>
+      .note-preview {
+        cursor: pointer;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 300px; /* Adjust as needed */
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container mt-5">
+      <h1 id="greeting">Your Notes</h1>
+
+      <!-- Add Note Button -->
+      <button type="button" class="btn btn-primary mb-3" data-toggle="modal" data-target="#addModal">
+        Add Note
+      </button>
+
+      <!-- Notes Table -->
+      <table class="table">
+        <thead class="thead-dark">
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Your Notes</th>
+            <th scope="col">Date Created</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="notesTableBody">
+          <!-- Notes will be dynamically inserted here -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Logout Button -->
+    <div class="container mt-3 text-right">
+      <a href="logout.php" class="btn btn-danger">Logout</a>
+    </div>
+
+    <!-- Add Note Modal -->
+    <div class="modal fade" id="addModal" data-backdrop="static" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg rounded-3">
+          <div class="modal-header bg-dark text-white">
+            <h5 class="modal-title">Add New Note</h5>
+            <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+          </div>
+          <div class="modal-body">
+            <div class="form-floating">
+              <textarea class="form-control p-3 border rounded-3" placeholder="Write in your notes" id="addTextarea" style="height: 150px; resize: vertical;"></textarea>
+              <label for="addTextarea" class="text-muted">Enter your notes</label>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-dark" id="saveButton">Add Note</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Note Modal -->
+    <div class="modal fade" id="editModal" data-backdrop="static" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg rounded-3">
+          <div class="modal-header bg-dark text-white">
+            <h5 class="modal-title">Edit Note</h5>
+            <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+          </div>
+          <div class="modal-body">
+            <div class="form-floating">
+              <textarea class="form-control p-3 border rounded-3" placeholder="Write in your notes" id="editTextarea" style="height: 150px; resize: vertical;"></textarea>
+              <label for="editTextarea" class="text-muted">Edit your notes</label>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-dark" id="updateButton">Update Note</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Full Note Modal -->
+    <div class="modal fade" id="fullNoteModal" data-backdrop="static" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg rounded-3">
+          <div class="modal-header bg-dark text-white">
+            <h5 class="modal-title">Full Note</h5>
+            <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+          </div>
+          <div class="modal-body">
+            <p id="fullNoteContent"></p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+    <!-- Custom JavaScript -->
+    <script>
+      $(document).ready(function () {
+        getdata();
+
+        // Add Note
+        $('#saveButton').click(function () {
+          const noteText = $('#addTextarea').val();
+          if (noteText.trim() === "") {
+            alert("Note cannot be empty!");
+            return;
+          }
+
+          $.ajax({
+            type: "POST",
+            url: "database.php",
+            data: { action: "add", note: noteText },
+            success: function (response) {
+              try {
+                const data = JSON.parse(response);
+                if (data.status === "success") {
+                  $('#addModal').modal('hide');
+                  $('#addTextarea').val(''); // Clear the textarea
+                  getdata(); // Refresh the notes table
+                } else {
+                  alert("Error: " + (data.message || "Unknown error"));
+                }
+              } catch (e) {
+                alert("Invalid response from the server.");
+              }
+            },
+            error: function (xhr, status, error) {
+              alert("AJAX Error: " + error);
+            }
+          });
+        });
+
+        // Edit Note - Open Modal
+        $(document).on("click", ".edit_btn", function () {
+          const id = $(this).closest("tr").find(".stud_id").text();
+          const noteText = $(this).closest("tr").find("td:nth-child(2)").text();
+
+          $('#editTextarea').val(noteText);
+          $('#editModal').data('id', id).modal('show');
+        });
+
+        // Update Note
+        $('#updateButton').click(function () {
+          const id = $('#editModal').data('id');
+          const noteText = $('#editTextarea').val();
+
+          if (noteText.trim() === "") {
+            alert("Note cannot be empty!");
+            return;
+          }
+
+          $.ajax({
+            type: "POST",
+            url: "database.php",
+            data: { action: "update", id: id, note: noteText },
+            success: function (response) {
+              try {
+                const data = JSON.parse(response);
+                if (data.status === "success") {
+                  $('#editModal').modal('hide');
+                  getdata(); // Refresh the notes table
+                } else {
+                  alert("Error: " + (data.message || "Unknown error"));
+                }
+              } catch (e) {
+                alert("Invalid response from the server.");
+              }
+            },
+            error: function (xhr, status, error) {
+              alert("AJAX Error: " + error);
+            }
+          });
+        });
+
+        // Delete Note
+        $(document).on("click", ".delete_btn", function () {
+          const id = $(this).closest("tr").find(".stud_id").text();
+          if (confirm("Are you sure you want to delete this note?")) {
+            $.ajax({
+              type: "POST",
+              url: "database.php",
+              data: { action: "delete", id: id },
+              success: function (response) {
+                try {
+                  const data = JSON.parse(response);
+                  if (data.status === "success") {
+                    getdata(); // Refresh the notes table
+                  } else {
+                    alert("Error: " + (data.message || "Unknown error"));
+                  }
+                } catch (e) {
+                  alert("Invalid response from the server.");
+                }
+              },
+              error: function (xhr, status, error) {
+                alert("AJAX Error: " + error);
+              }
+            });
+          }
+        });
+
+        // Show Full Note on Click
+        $(document).on("click", ".note-preview", function () {
+          const fullNote = $(this).data('full-note');
+          $('#fullNoteContent').text(fullNote);
+          $('#fullNoteModal').modal('show');
+        });
+
+        // Fetch Notes Function
+        function getdata() {
+          $.ajax({
+            type: "POST",
+            url: "database.php",
+            data: { action: "fetch" },
+            success: function (response) {
+              try {
+                const data = JSON.parse(response);
+                if (data.status === "success") {
+                  const notesTableBody = $("#notesTableBody");
+                  notesTableBody.empty();
+
+                  if (data.notes.length > 0) {
+                    data.notes.forEach(note => {
+                      const firstLine = note.notes.split('\n')[0]; // Get the first line
+                      notesTableBody.append(`
+                        <tr>
+                          <td class="stud_id">${note.note_id}</td>
+                          <td>
+                            <div class="note-preview" data-full-note="${note.notes}">
+                              ${firstLine}
+                            </div>
+                          </td>
+                          <td>${note.date_created}</td>
+                          <td>
+                            <a href="#" class="badge btn-primary edit_btn">EDIT</a>
+                            <a href="#" class="badge btn-danger delete_btn">DELETE</a>
+                          </td>
+                        </tr>
+                      `);
+                    });
+                  } else {
+                    notesTableBody.append("<tr><td colspan='4'>No notes found.</td></tr>");
+                  }
+                } else {
+                  alert(data.message);
+                }
+              } catch (error) {
+                console.error("Error parsing JSON:", error);
+              }
+            },
+            error: function () {
+              alert("Error fetching notes.");
+            }
+          });
+        }
+      });
+    </script>
+  </body>
+</html>
